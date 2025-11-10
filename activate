@@ -3,7 +3,7 @@ if [ "$BASH" != "" ]; then
 	SOURCE="${BASH_SOURCE[0]}";
 else
 	SOURCE="$0";
-fi
+fi;
 
 while [ -h "$SOURCE" ]; do
   DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
@@ -12,5 +12,4 @@ while [ -h "$SOURCE" ]; do
 done
 DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
 
-export PATH=$DIR/utils:$PATH
-export PINTOS_HOME=$DIR
+PATH=$DIR/utils:$PATH
