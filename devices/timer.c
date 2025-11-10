@@ -100,11 +100,12 @@ timer_sleep (int64_t ticks) {
 	int64_t wakeup_time = timer_ticks() + ticks;
 	
 	struct thread *t = thread_current();
-	enum intr_level old_level = intr_disable ();
+
 	t->wakeup_time = wakeup_time;
-	list_insert_ordered(&sleep_list,&t->elem,compare_time,NULL);
-	thread_block();
-	intr_set_level (old_level);
+	list_insert_ordered(&sleep_list,&t->elem,compare_time,NULL); // 삽입정렬 함수 sleep list에 wakeup time을 이제 오름차순으로 삽입해서 제일 앞에 있는 애 빼서 쓸수있게 그러면 순회안하도됨
+	enum intr_level old_level = intr_disable (); // interupt 를 꺼야 호환성 문제 안생김
+	thread_block(); // sleep  이새끼가 재우는 친구
+	intr_set_level (old_level); // 이건 인터럽트 키는 친구 하던일 멈추고 딴일 시키느거
 }
 
 /* Suspends execution for approximately MS milliseconds. */
@@ -147,7 +148,9 @@ wakeup_thread(void) {
 		struct thread *thread = list_entry(poped_list,struct thread,elem);
 		if (thread->wakeup_time <= timer_ticks()) {
 			list_pop_front(&sleep_list);
+			enum intr_level old_level = intr_disable();
 			thread_unblock(thread);
+			intr_set_level(old_level); // 이건 스포임
 		}
 		else {
 			break;
